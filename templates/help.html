@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}About and help | PhishShield{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">ABOUT PHISHSHIELD</p>
+  <h1>About and help</h1>
+  <p>PhishShield is an MCA cybersecurity education project for campaign-based awareness exercises and explainable email risk assessment. It uses Flask, SQLite, HTML, CSS, JavaScript and a Python rule engine.</p>
+</section>
+
+<section class="help-grid">
+  <article class="info-card">
+    <h2>Ethical use and privacy</h2>
+    <ul>
+      <li>Use fictional messages only, with authorized participants and an instructor-led learning goal.</li>
+      <li>PhishShield sends no email, opens no external destination and never requests passwords or other sensitive information.</li>
+      <li>Participant IDs are random local identifiers; do not use results to shame or rank individuals.</li>
+      <li>Instructor campaign management, research, and analytics require an instructor login. Configure a strong secret key and hashed instructor password before deployment.</li>
+    </ul>
+  </article>
+  <article class="info-card">
+    <h2>Instructor workflow</h2>
+    <ol>
+      <li>Review the email library and supporting research.</li>
+      <li>Create a campaign, assign messages, and activate it when ready.</li>
+      <li>Share the local invitation path with participants.</li>
+      <li>Review persisted campaign events and aggregate dashboard metrics.</li>
+    </ol>
+  </article>
+  <article class="info-card">
+    <h2>Participant workflow</h2>
+    <ol>
+      <li>Open the campaign invitation and join with a generated pseudonymous identifier.</li>
+      <li>Present each assigned message through the explicit action button.</li>
+      <li>Report it as phishing, mark it legitimate, or choose the safe simulated interaction.</li>
+      <li>Review feedback and continue until the exercise summary appears.</li>
+    </ol>
+  </article>
+  <article class="info-card">
+    <h2>Interpreting email analysis</h2>
+    <p>The Python rule engine produces an explainable heuristic score from supplied text and metadata. A score is not a probability, identity check, or guarantee. Missing evidence is reported as a limitation.</p>
+    <p>URLs are inspected only as text. PhishShield does not resolve or visit them, and it does not execute attachments.</p>
+  </article>
+  <article class="info-card">
+    <h2>Local commands</h2>
+    <p>From the project directory in PowerShell:</p>
+    <pre><code>python app.py
+python -m detection.cli evaluate
+python -m unittest discover -s tests -q
+python research\validate_dataset.py</code></pre>
+    <p>See the README for setup instructions and the research documents for definitions, limitations and available sources.</p>
+  </article>
+  <article class="info-card">
+    <h2>Known limitations</h2>
+    <ul>
+      <li>Instructor access is configured through environment variables; there is no public instructor registration.</li>
+      <li>Browser-session identifiers are pseudonymous, not verified people; clearing browser data starts a new identity.</li>
+      <li>The training library is fictional and the detection engine is rule-based. Neither replaces organizational reporting or professional security review.</li>
+    </ul>
+  </article>
+</section>
+{% endblock %}

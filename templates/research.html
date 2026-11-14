@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Research and sample emails | PhishShield{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">INSTRUCTOR RESOURCE LIBRARY</p>
+  <h1>Email library and research</h1>
+  <p>Browse fictional teaching messages, their instructor-only classifications and indicators, alongside the project's documented research.</p>
+</section>
+
+<section class="research-documents" aria-label="Research documents">
+  <article class="info-card">
+    <h2>Social engineering research</h2>
+    <p>Definitions, psychological triggers, prevention, and research methodology.</p>
+    <a href="{{ url_for('research_document', document_name='social_engineering_research.md') }}">Open research report</a>
+  </article>
+  <article class="info-card">
+    <h2>Documented case studies</h2>
+    <p>Incident summaries with source references and clearly separated analysis.</p>
+    <a href="{{ url_for('research_document', document_name='case_studies.md') }}">Open case studies</a>
+  </article>
+  <article class="info-card">
+    <h2>Detection indicators</h2>
+    <p>Signal descriptions, verification requirements, and limitations.</p>
+    <a href="{{ url_for('research_document', document_name='detection_indicators.md') }}">Open indicator guide</a>
+  </article>
+  <article class="info-card">
+    <h2>Dataset documentation</h2>
+    <p>Schema, safe-use guidance, validation, and Python loading instructions.</p>
+    <a href="{{ url_for('research_document', document_name='dataset_documentation.md') }}">Open dataset documentation</a>
+  </article>
+</section>
+
+<section class="summary-section">
+  <h2>Training Email Library</h2>
+  <p class="muted">These are fictional educational examples, not real or intercepted emails. Classifications and notes are for instructor review.</p>
+  <p><strong>Selected campaign:</strong> {{ selected_campaign_id }} · <a href="{{ url_for('manage_campaigns') }}">Manage campaigns</a></p>
+  {% if campaign_records %}
+  <form method="post" action="{{ url_for('select_campaign') }}" class="dashboard-filter">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="research-campaign">Simulation campaign</label>
+    <select id="research-campaign" name="campaign_id">
+      {% for campaign in campaign_records %}
+        <option value="{{ campaign.campaign_id }}" {% if selected_campaign_id == campaign.campaign_id %}selected{% endif %}>{{ campaign.campaign_name }} ({{ campaign.status }})</option>
+      {% endfor %}
+    </select>
+    <button class="button button-primary" type="submit">Select campaign</button>
+  </form>
+  {% endif %}
+  <form method="get" action="{{ url_for('research') }}" class="library-filters">
+    <label for="library-search">Search subject or message text</label>
+    <input id="library-search" name="q" type="search" maxlength="100" value="{{ query }}" placeholder="Search the library">
+    <label for="library-category">Category</label>
+    <select id="library-category" name="category">
+      <option value="">All categories</option>
+      {% for category in categories %}
+      <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>{{ category }}</option>
+      {% endfor %}
+    </select>
+    <label for="library-classification">Classification</label>
+    <select id="library-classification" name="classification">
+      <option value="">All classifications</option>
+      <option value="phishing" {% if selected_classification == "phishing" %}selected{% endif %}>Phishing</option>
+      <option value="legitimate" {% if selected_classification == "legitimate" %}selected{% endif %}>Legitimate</option>
+    </select>
+    <button class="button button-primary" type="submit">Apply filters</button>
+    <a class="button button-quiet" href="{{ url_for('research') }}">Clear</a>
+  </form>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Scenario</th><th>Subject</th><th>Classification</th><th>Indicators</th><th>Details</th></tr></thead>
+      <tbody>
+      {% for sample in research_samples %}
+        <tr>
+          <td>{{ sample.scenario }}</td>
+          <td>{{ sample.subject }}</td>
+          <td>{{ sample.email_type|title }}</td>
+          <td>{{ sample.suspicious_indicators|length }}</td>
+          <td><a href="{{ url_for('research_email', email_id=sample.email_id) }}">Review instructor notes</a></td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5">No training emails match these filters.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

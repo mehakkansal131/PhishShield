@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10233c">
+  <title>{% block title %}PhishShield{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  {% block page_scripts %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">P</span><span>PhishShield</span></a>
+    <nav aria-label="Main navigation">
+      {% if instructor_authenticated %}
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('manage_campaigns') }}">Campaigns</a>
+        <a href="{{ url_for('research') }}" aria-label="Research email library">Email library</a>
+        <a href="{{ url_for('instructor_summary') }}" aria-label="Tracking summary">Tracking</a>
+      {% else %}
+        <a href="{{ url_for('instructor_login') }}">Instructor login</a>
+      {% endif %}
+      <a href="{{ url_for('campaigns') }}">Simulation</a>
+      <a href="{{ url_for('detection_tool') }}" aria-label="Detection: analyze email">Analyze email</a>
+      <a href="{{ url_for('help_page') }}">Help</a>
+    </nav>
+    {% if instructor_authenticated %}
+      <form class="header-logout" method="post" action="{{ url_for('instructor_logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit">Log out</button>
+      </form>
+    {% endif %}
+    <span class="environment-badge">{{ environment_label }}</span>
+  </header>
+
+  <main class="page-content">
+    {% if dataset_error %}
+      <div class="notice notice-error" role="alert">
+        <strong>Sample dataset unavailable.</strong>
+        Training scenarios and sample-based analysis are disabled until the dataset is corrected.
+        {{ dataset_error }}
+      </div>
+    {% endif %}
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="notice" role="status">
+          {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+      <p>Educational simulation and detection tool only; results do not guarantee that an email is safe or malicious. No email is sent and no credentials are collected.</p>
+  </footer>
+</body>
+</html>

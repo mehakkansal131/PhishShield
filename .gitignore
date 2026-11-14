@@ -1,0 +1,29 @@
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# SQLite databases and backups
+*.db
+*.sqlite
+*.sqlite3
+*.bak
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Test and cache files
+.pytest_cache/
+.coverage
+htmlcov/

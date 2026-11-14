@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ sample.subject }} | Email library{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading">
+  <p class="eyebrow">INSTRUCTOR REFERENCE · {{ sample.email_id }}</p>
+  <h1>{{ sample.subject }}</h1>
+  <p>{{ sample.scenario }} · <span class="label-chip label-{{ sample.email_type }}">{{ sample.email_type }}</span></p>
+</section>
+<div class="research-detail-grid">
+  <article class="email-panel">
+    <h2>Fictional message</h2>
+    <dl class="email-details">
+      <div><dt>From</dt><dd>{{ sample.sender_display_name }} &lt;{{ sample.sender_email }}&gt;</dd></div>
+      <div><dt>Reply-To</dt><dd>{{ sample.reply_to }}</dd></div>
+      <div><dt>Subject</dt><dd>{{ sample.subject }}</dd></div>
+    </dl>
+    <div class="email-body">{{ sample.email_body }}</div>
+  </article>
+  <article class="info-card instructor-notes">
+    <h2>Instructor notes</h2>
+    <p><strong>Expected detection rationale</strong><br>{{ sample.expected_detection_reason }}</p>
+    <p><strong>Psychological trigger</strong><br>{{ sample.psychological_trigger }}</p>
+    <p><strong>Recommended response</strong><br>{{ sample.recommended_user_action }}</p>
+    <h3>Indicators</h3>
+    {% if sample.suspicious_indicators %}
+    <ul class="indicator-list">
+      {% for indicator in sample.suspicious_indicators %}<li>{{ indicator }}</li>{% endfor %}
+    </ul>
+    {% else %}
+    <p>No warning indicators were intentionally included in this routine message.</p>
+    {% endif %}
+    {% if sample.source %}
+    <p><strong>Source</strong><br>{{ sample.source }}</p>
+    {% endif %}
+  </article>
+</div>
+<p class="back-link"><a href="{{ url_for('research') }}">Return to email library</a></p>
+{% endblock %}

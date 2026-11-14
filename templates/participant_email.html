@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Review message | PhishShield{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading">
+  <p class="eyebrow">{{ campaign.campaign_name }}</p>
+  <h1>Review the message</h1>
+  <p>Look at the sender, reply address, subject and wording. The expected classification is hidden until you respond.</p>
+</section>
+<article class="email-panel participant-email-panel">
+  <div class="email-topline">
+    <span class="email-icon" aria-hidden="true">P</span>
+    <div><p class="email-label">Fictional training message</p><p class="muted">Local exercise · no email was received</p></div>
+  </div>
+  <dl class="email-details">
+    <div><dt>From</dt><dd>{{ sample.sender_display_name }} &lt;{{ sample.sender_email }}&gt;</dd></div>
+    <div><dt>Reply-To</dt><dd>{{ sample.reply_to }}</dd></div>
+    <div><dt>Subject</dt><dd>{{ sample.subject }}</dd></div>
+  </dl>
+  <div class="email-body">{{ sample.email_body }}</div>
+  <p class="simulation-note">Any URLs in this message are inert text. The interaction option below goes only to an internal learning page.</p>
+  <form method="post" action="{{ url_for('participant_respond', campaign_id=campaign.campaign_id, email_id=sample.email_id) }}" class="decision-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <fieldset>
+      <legend>What would you do?</legend>
+      <label class="decision-option"><input type="radio" name="response" value="phishing" required><span><strong>Report as phishing</strong><small>Flag the message for review</small></span></label>
+      <label class="decision-option"><input type="radio" name="response" value="legitimate"><span><strong>Mark as legitimate</strong><small>Treat it as routine communication</small></span></label>
+      <label class="decision-option"><input type="radio" name="response" value="clicked"><span><strong>Interact with the simulated link</strong><small>Continue to a safe internal learning page</small></span></label>
+    </fieldset>
+    <button class="button button-primary" type="submit">Submit decision</button>
+  </form>
+</article>
+{% endblock %}

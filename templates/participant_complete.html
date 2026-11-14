@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Exercise complete | PhishShield{% endblock %}
+{% block content %}
+<section class="feedback-panel participant-feedback">
+  <p class="eyebrow">EXERCISE COMPLETE</p>
+  <h1>Thank you for taking part</h1>
+  <p>{{ campaign.campaign_name }} is complete. Your result is private to this local browser session.</p>
+  <div class="completion-metrics">
+    <div><span>Messages answered</span><strong>{{ progress.answers|length }}</strong></div>
+    <div><span>Correct classifications</span><strong>{{ progress.answers.values()|selectattr("is_correct", "equalto", true)|list|length }}</strong></div>
+    <div><span>Incorrect classifications</span><strong>{{ progress.answers.values()|selectattr("is_correct", "equalto", false)|list|length }}</strong></div>
+  </div>
+  <p>These results describe this exercise only. They are not a measure of real-world susceptibility.</p>
+  <a class="button button-secondary" href="{{ url_for('index') }}">Return to PhishShield</a>
+</section>
+{% endblock %}

@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% if detail_mode %}
+  {% set page_title = data.campaign.campaign_name %}
+{% else %}
+  {% set page_title = "Results dashboard" %}
+{% endif %}
+{% block title %}{{ page_title }} | PhishShield{% endblock %}
+{% block content %}
+<section class="dashboard-heading">
+  <div>
+    <p class="eyebrow">MODULE 4 · RESULTS & ANALYSIS</p>
+    {% if detail_mode %}
+      <h1>{{ data.campaign.campaign_name }}</h1>
+      <p>{{ data.campaign.description }} <span class="campaign-status">{{ data.campaign.status }}</span></p>
+    {% else %}
+      <h1>Campaign results dashboard</h1>
+      <p>Understand training activity using persisted local simulation data. Aggregate results only; no participant names or email addresses are collected.</p>
+    {% endif %}
+  </div>
+  <div class="dashboard-actions">
+    {% if detail_mode %}
+      <a class="button button-secondary" href="{{ url_for('dashboard') }}">All campaigns</a>
+    {% endif %}
+    <a class="button button-secondary" href="{{ url_for('export_dashboard_csv') }}">Export campaign CSV</a>
+  </div>
+</section>
+
+{% if not detail_mode %}
+<section class="dashboard-filter" aria-label="Dashboard filters">
+  <form method="get" action="{{ url_for('dashboard') }}">
+    <label for="campaign-filter">Filter by campaign</label>
+    <select id="campaign-filter" name="campaign_id">
+      <option value="">All campaigns</option>
+      {% for campaign in data.campaign_options %}
+        <option value="{{ campaign.campaign_id }}" {% if data.selected_campaign_id == campaign.campaign_id %}selected{% endif %}>{{ campaign.campaign_name }}</option>
+      {% endfor %}
+    </select>
+    <button class="button button-primary" type="submit">Apply</button>
+  </form>
+</section>
+{% endif %}
+
+<section class="dashboard-metrics" aria-label="Campaign summary metrics">
+  <article class="dashboard-metric">
+    <span>Total campaigns</span><strong>{{ data.summary.total_campaigns }}</strong>
+    <small>In the selected view</small>
+  </article>
+  <article class="dashboard-metric">
+    <span>Active campaigns</span><strong>{{ data.summary.active_campaigns }}</strong>
+    <small>Paused campaigns are excluded</small>
+  </article>
+  <article class="dashboard-metric">
+    <span>Completed campaigns</span><strong>{{ data.summary.completed_campaigns }}</strong>
+    <small>Closed campaign records</small>
+  </article>
+  <article class="dashboard-metric">
+    <span>Unique participants</span><strong>{{ data.summary.unique_participants }}</strong>
+    <small>Joined participants plus legacy displayed IDs</small>
+  </article>
+  <article class="dashboard-metric">
+    <span>Emails presented</span><strong>{{ data.summary.display_events }}</strong>
+    <small>Intentional display submissions</small>
+  </article>
+  <article class="dashboard-metric">
+    <span>Simulated clicks</span><strong>{{ data.summary.click_events }}</strong>
+    <small>Unique per participant, message and campaign</small>
+  </article>
+  <article class="dashboard-metric">
+    <span>Reported as phishing</span><strong>{{ data.summary.report_events }}</strong>
+    <small>Submitted participant decisions</small>
+  </article>
+  <article class="dashboard-metric">
+    <span>Correct classifications</span><strong>{{ data.summary.correct_responses }}</strong>
+    <small>Answered messages only</small>
+  </article>
+  <article class="dashboard-metric">
+    <span>Incorrect classifications</span><strong>{{ data.summary.incorrect_responses }}</strong>
+    <small>Simulated-link choices are unclassified</small>
+  </article>
+  <article class="dashboard-metric">
+    <span>Completion rate</span><strong>{{ "%.1f"|format(data.summary.completion_rate) }}%</strong>
+    <small>{{ data.summary.completed_participants }} completed ÷ {{ data.summary.joined_participants }} joined</small>
+  </article>
+</section>
+
+<section class="analytics-grid">
+  <article class="analytics-panel chart-panel">
+    <div class="panel-heading">
+      <div><p class="eyebrow">CAMPAIGN COMPARISON</p><h2>Activity by campaign</h2></div>
+      <p>Displays are event totals. Clicks and reports in this chart are unique participant counts.</p>
+    </div>
+    <div id="campaign-chart" class="chart-canvas" aria-label="Campaign activity chart"></div>
+    {% if data.campaigns %}
+    <div class="table-wrap chart-data-table">
+      <table>
+        <caption>Campaign comparison data</caption>
+        <thead><tr><th>Campaign</th><th>Displays</th><th>Unique clickers</th><th>Unique reporters</th></tr></thead>
+        <tbody>
+        {% for campaign in data.campaigns %}
+          <tr>
+            <td>{% if not detail_mode %}<a href="{{ url_for('campaign_dashboard', campaign_id=campaign.campaign_id) }}">{{ campaign.campaign_name }}</a>{% else %}{{ campaign.campaign_name }}{% endif %}</td>
+            <td>{{ campaign.display_events }}</td><td>{{ campaign.unique_clicked }}</td><td>{{ campaign.unique_reported }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="empty-state">No campaign records are available to compare.</p>
+    {% endif %}
+  </article>
+
+  <article class="analytics-panel chart-panel">
+    <div class="panel-heading">
+      <div><p class="eyebrow">RESPONSE RATES</p><h2>Click-through and report rates</h2></div>
+      <p>Each rate = unique participants who clicked or reported ÷ unique participants who displayed × 100.</p>
+    </div>
+    <div id="rate-chart" class="chart-canvas" aria-label="Click and report rate chart"></div>
+    {% if data.campaigns %}
+    <div class="table-wrap chart-data-table">
+      <table>
+        <caption>Campaign rates and unique-participant denominators</caption>
+        <thead><tr><th>Campaign</th><th>Displayed participants</th><th>Click rate</th><th>Report rate</th></tr></thead>
+        <tbody>
+        {% for campaign in data.campaigns %}
+          <tr><td>{{ campaign.campaign_name }}</td><td>{{ campaign.unique_displayed }}</td><td>{{ "%.1f"|format(campaign.click_rate) }}%</td><td>{{ "%.1f"|format(campaign.report_rate) }}%</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="empty-state">Rates will appear when campaign records are available.</p>
+    {% endif %}
+  </article>
+</section>
+
+<section class="analytics-grid lower-analytics">
+  <article class="analytics-panel chart-panel">
+    <div class="panel-heading">
+      <div><p class="eyebrow">SCENARIO ANALYSIS</p><h2>Outcomes by scenario</h2></div>
+      <p>Labels are instructor-only. A rate uses distinct participants displayed for that scenario as the denominator.</p>
+    </div>
+    <div id="scenario-chart" class="chart-canvas chart-canvas-tall" aria-label="Scenario click and report rates chart"></div>
+    <div class="table-wrap">
+      <table>
+        <caption>Scenario outcomes</caption>
+        <thead><tr><th>Scenario</th><th>Email type</th><th>Display events</th><th>Unique displayed</th><th>Unique clicked</th><th>Unique reported</th><th>Click rate</th><th>Report rate</th></tr></thead>
+        <tbody>
+        {% for scenario in data.scenarios %}
+          <tr>
+            <td>{{ scenario.scenario }}</td>
+            <td><span class="label-chip label-{{ scenario.email_type }}">{{ scenario.email_type }}</span></td>
+            <td>{{ scenario.display_events }}</td><td>{{ scenario.unique_displayed }}</td>
+            <td>{{ scenario.unique_clicked }}</td><td>{{ scenario.unique_reported }}</td>
+            <td>{{ "%.1f"|format(scenario.click_rate) }}%</td><td>{{ "%.1f"|format(scenario.report_rate) }}%</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="8">No email scenario metadata is available.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="analytics-panel chart-panel">
+    <div class="panel-heading">
+      <div><p class="eyebrow">ACTIVITY OVER TIME</p><h2>Event timeline</h2></div>
+      <p>Events are grouped by their stored UTC date. The chart shows the latest 30 days ending on the latest valid event date.</p>
+    </div>
+    {% if data.timeline.available %}
+      <div id="timeline-chart" class="chart-canvas chart-canvas-tall" aria-label="Daily event timeline chart"></div>
+      {% if data.timeline.invalid_timestamps %}
+        <p class="empty-state">{{ data.timeline.invalid_timestamps }} event timestamp(s) were invalid and omitted.</p>
+      {% endif %}
+      <div class="table-wrap">
+        <table>
+          <caption>Daily event counts (UTC)</caption>
+          <thead><tr><th>Date</th><th>Displayed</th><th>Clicked</th><th>Reported</th></tr></thead>
+          <tbody>
+          {% for day in data.timeline.days %}
+            {% if day.displayed or day.clicked or day.reported %}
+              <tr><td>{{ day.date }}</td><td>{{ day.displayed }}</td><td>{{ day.clicked }}</td><td>{{ day.reported }}</td></tr>
+            {% endif %}
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="empty-state">{{ data.timeline.reason }}
+        {% if data.timeline.invalid_timestamps %} {{ data.timeline.invalid_timestamps }} invalid timestamp(s) were omitted.{% endif %}
+        The timeline will become available when valid event timestamps are recorded.
+      </p>
+    {% endif %}
+  </article>
+</section>
+
+<section class="summary-section">
+  <div class="section-heading">
+    <div><p class="eyebrow">RECENT ACTIVITY</p><h2>Campaign activity</h2></div>
+    <p>Participant actions and legacy simulation events, newest first.</p>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Time (UTC)</th><th>Campaign</th><th>Action</th><th>Message</th><th>Participant ID</th><th>Response</th></tr></thead>
+      <tbody>
+      {% for activity in data.recent_activity %}
+        <tr><td>{{ activity.timestamp }}</td><td>{{ activity.campaign_name }}</td><td>{{ activity.action|replace('_', ' ')|title }}</td><td>{{ activity.email_id or "—" }}</td><td>{{ activity.participant_id }}</td><td>{{ activity.response or "—" }}</td></tr>
+      {% else %}
+        <tr><td colspan="6">No campaign activity has been recorded.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% if detail_mode %}
+<section class="summary-section">
+  <h2>Participants in this campaign</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pseudonymous ID</th><th>Joined</th><th>Correct</th><th>Incorrect</th><th>Completion</th></tr></thead>
+      <tbody>
+      {% for participant in data.participants %}
+        <tr><td>{{ participant.participant_id }}</td><td>{{ participant.created_at }}</td><td>{{ participant.correct_answers or 0 }}</td><td>{{ participant.incorrect_answers or 0 }}</td><td>{% if participant.completed %}Complete{% else %}In progress{% endif %}</td></tr>
+      {% else %}
+        <tr><td colspan="5">No participants have joined this campaign.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+<section class="summary-section">
+  <h2>{% if detail_mode %}Campaign details{% else %}Campaign summaries{% endif %}</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Campaign</th><th>Status</th><th>Display events</th><th>Click rate</th><th>Report rate</th><th>Created</th></tr></thead>
+      <tbody>
+      {% for campaign in data.campaigns %}
+        <tr>
+          <td><a href="{{ url_for('campaign_dashboard', campaign_id=campaign.campaign_id) }}">{{ campaign.campaign_name }}</a></td>
+          <td>{{ campaign.status }}</td><td>{{ campaign.display_events }}</td>
+          <td>{{ "%.1f"|format(campaign.click_rate) }}%</td><td>{{ "%.1f"|format(campaign.report_rate) }}%</td>
+          <td>{{ campaign.created_at }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6">There are no campaign records to display.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="analytics-limits">
+  <h2>How to interpret these results</h2>
+  <ul>
+    <li>Display, click, and report event totals are stored events; they are not the same as distinct participants.</li>
+    <li>Rates use distinct participants with a displayed email as the denominator; a zero denominator produces a 0.0% rate.</li>
+    <li>Module 3 deduplicates each action for a participant and sample within a campaign. Browser sessions are synthetic IDs, not verified people.</li>
+    <li>These measures describe this small local training dataset and are not estimates of real-world susceptibility or organizational risk.</li>
+    <li>Dashboard labels describe the exercise dataset. They are not output from the future Module 5 detection engine.</li>
+  </ul>
+</section>
+
+<script id="dashboard-data" type="application/json">{{ data|tojson }}</script>
+{% endblock %}
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Scenarios | PhishShield{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">PARTICIPANT SIMULATION</p>
+  <h1>Practice safer email decisions</h1>
+  <p>Join an active exercise to review its assigned messages, submit a response and receive private feedback after each decision.</p>
+  {% if instructor_authenticated %}
+  <p><a href="{{ url_for('manage_campaigns') }}">Manage campaigns</a></p>
+  {% endif %}
+</section>
+
+{% if campaign_records %}
+{% if instructor_authenticated %}
+<section class="dashboard-filter" aria-label="Select campaign">
+  <form method="post" action="{{ url_for('select_campaign') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="simulation-campaign">Simulation campaign</label>
+    <select id="simulation-campaign" name="campaign_id">
+      {% for campaign in campaign_records %}
+        <option value="{{ campaign.campaign_id }}" {% if selected_campaign_id == campaign.campaign_id %}selected{% endif %}>{{ campaign.campaign_name }} ({{ campaign.status }})</option>
+      {% endfor %}
+    </select>
+    <button class="button button-primary" type="submit">Select campaign</button>
+  </form>
+</section>
+{% endif %}
+<section class="scenario-grid campaign-join-grid" aria-label="Active training campaigns">
+  {% for campaign in campaign_records %}
+  <article class="scenario-card">
+    <p class="scenario-category">ACTIVE CAMPAIGN</p>
+    <h2>{{ campaign.campaign_name }}</h2>
+    <p>{{ campaign.description or "A PhishShield security awareness exercise." }}</p>
+    <p class="muted">Messages assigned: {{ campaign.email_count if campaign.email_count is defined else "See invitation" }}</p>
+    <a class="button button-primary" href="{{ url_for('join_campaign', campaign_id=campaign.campaign_id) }}">Join campaign</a>
+  </article>
+  {% endfor %}
+</section>
+{% endif %}
+
+<section class="summary-section">
+  <h2>Training message library</h2>
+  <p class="muted">These fictional messages are used only within their assigned campaigns. Labels and instructor explanations are withheld during participation.</p>
+</section>
+<section class="scenario-grid" aria-label="Available training messages">
+  {% for sample in campaigns %}
+  <article class="scenario-card">
+    <p class="scenario-category">{{ sample.scenario }}</p>
+    <p class="sample-id">{{ sample.email_id }}</p>
+    <h2>{{ sample.subject }}</h2>
+    <p class="muted">From {{ sample.sender_display_name }}</p>
+    <p>{{ sample.email_body[:180] }}{% if sample.email_body|length > 180 %}…{% endif %}</p>
+    {% if campaign_records %}
+      <a class="button button-secondary" href="{{ url_for('join_campaign', campaign_id=selected_campaign_id) }}">Join to practice</a>
+    {% else %}
+      <span class="muted">No active campaign is available.</span>
+    {% endif %}
+  </article>
+  {% else %}
+  <p>No training scenarios are available.</p>
+  {% endfor %}
+</section>
+{% endblock %}

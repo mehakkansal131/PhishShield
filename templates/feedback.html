@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Training feedback | PhishShield{% endblock %}
+{% block content %}
+<section class="feedback-panel">
+  {% if event.event_type == "click" %}
+    <p class="eyebrow">LEARNING MOMENT</p>
+    {% if sample.email_type == "phishing" %}
+      <h1>You opened a simulated phishing action</h1>
+      <p>This was a fictional classroom example. No external page opened, and no credentials or personal information were collected.</p>
+    {% else %}
+      <h1>You interacted with a simulated message</h1>
+      <p>This sample is labelled as a routine legitimate message in the instructor dataset. The action stayed inside this local training app.</p>
+    {% endif %}
+    <h2>What to notice</h2>
+    {% if sample.suspicious_indicators %}
+      <ul class="indicator-list">
+        {% for indicator in sample.suspicious_indicators %}<li>{{ indicator }}</li>{% endfor %}
+      </ul>
+    {% else %}
+      <p>No warning signs were deliberately included in this routine sample. Real messages still need context-aware verification.</p>
+    {% endif %}
+    <p><strong>Teaching concept:</strong> {{ sample.psychological_trigger }}</p>
+    <p><strong>Safer response:</strong> {{ sample.recommended_user_action }}</p>
+  {% else %}
+    <p class="eyebrow">REPORT RECEIVED</p>
+    <h1>Thank you for reporting the training message</h1>
+    <p>Reporting suspicious messages helps an organization review possible threats and alert others. You are not graded or identified publicly for this choice.</p>
+    {% if sample.email_type == "legitimate" %}
+      <p>This sample is labelled as a routine message in the instructor dataset. It is still reasonable to ask for verification if a real message seems unusual.</p>
+    {% else %}
+      <p>This fictional sample was designed to illustrate: <strong>{{ sample.psychological_trigger }}</strong>.</p>
+    {% endif %}
+    <p><strong>Safer response:</strong> {{ sample.recommended_user_action }}</p>
+  {% endif %}
+  <a class="button button-secondary" href="{{ url_for('campaigns') }}">Return to scenarios</a>
+</section>
+{% endblock %}

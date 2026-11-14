@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ campaign.campaign_name }} | PhishShield{% endblock %}
+{% block content %}
+<section class="participant-shell">
+  <p class="eyebrow">YOUR EXERCISE</p>
+  <h1>{{ campaign.campaign_name }}</h1>
+  <p class="lead">Review each fictional message, make a decision, then use the feedback to identify safer next steps.</p>
+  <div class="progress-summary">
+    <span>{{ progress.answers|length }} of {{ progress.assigned_email_ids|length }} messages answered</span>
+    <span class="participant-id">Private local ID · {{ participant_id }}</span>
+  </div>
+  {% if sample %}
+  <article class="exercise-next-card">
+    <p class="eyebrow">NEXT MESSAGE</p>
+    <h2>{{ sample.subject }}</h2>
+    <p>{{ sample.scenario }} · From {{ sample.sender_display_name }}</p>
+    <form method="post" action="{{ url_for('participant_display', campaign_id=campaign.campaign_id, email_id=sample.email_id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="button button-primary" type="submit">Present message</button>
+    </form>
+  </article>
+  {% else %}
+  <div class="exercise-next-card">
+    <h2>All assigned messages have a response</h2>
+    <p>Continue to save your completion and review your private summary.</p>
+    <form method="post" action="{{ url_for('participant_next', campaign_id=campaign.campaign_id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="button button-primary" type="submit">Complete exercise</button>
+    </form>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

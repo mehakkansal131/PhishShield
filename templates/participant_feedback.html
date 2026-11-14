@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Exercise feedback | PhishShield{% endblock %}
+{% block content %}
+<section class="feedback-panel participant-feedback">
+  <p class="eyebrow">MESSAGE FEEDBACK</p>
+  {% if action.response == "clicked" %}
+    <h1>That link interaction was simulated</h1>
+    <p>No external page opened. This choice is recorded as a simulated interaction, not as a classification.</p>
+  {% elif action.is_correct %}
+    <h1>Your classification was correct</h1>
+    <p>This exercise message is labeled <strong>{{ sample.email_type }}</strong> in the instructor dataset.</p>
+  {% else %}
+    <h1>Review the message signals</h1>
+    <p>This exercise message is labeled <strong>{{ sample.email_type }}</strong> in the instructor dataset. The goal is to practice verification, not to rank participants.</p>
+  {% endif %}
+  <h2>{{ sample.subject }}</h2>
+  {% if sample.suspicious_indicators %}
+    <h3>Indicators to consider</h3>
+    <ul class="indicator-list">
+      {% for indicator in sample.suspicious_indicators %}<li>{{ indicator }}</li>{% endfor %}
+    </ul>
+  {% else %}
+    <p>No warning signs were deliberately included in this routine fictional message. Real messages still need context-aware verification.</p>
+  {% endif %}
+  <p><strong>Safer next step:</strong> {{ sample.recommended_user_action }}</p>
+  <form method="post" action="{{ url_for('participant_next', campaign_id=campaign.campaign_id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="button button-primary" type="submit">Continue to next message</button>
+  </form>
+</section>
+{% endblock %}

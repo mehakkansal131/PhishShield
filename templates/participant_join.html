@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Join {{ campaign.campaign_name }} | PhishShield{% endblock %}
+{% block content %}
+<section class="participant-shell">
+  <p class="eyebrow">SECURITY AWARENESS EXERCISE</p>
+  <h1>{{ campaign.campaign_name }}</h1>
+  <p class="lead">{{ campaign.description }}</p>
+  <div class="notice safety-notice">
+    <strong>Privacy and safety</strong>
+    <p>Participation uses a random local identifier. No name, email address, password or other personal information is requested. Messages and simulated links remain inside PhishShield.</p>
+  </div>
+  {% if campaign.status == "active" %}
+  <form method="post" class="participant-action-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="button button-primary" type="submit">Join exercise</button>
+  </form>
+  {% else %}
+  <p class="empty-state">This campaign is {{ campaign.status }} and is not accepting participants.</p>
+  {% endif %}
+</section>
+{% endblock %}

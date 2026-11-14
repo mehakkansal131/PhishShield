@@ -1,0 +1,161 @@
+[
+  {
+    "email_id": "PS-PH-001",
+    "email_type": "phishing",
+    "scenario": "Fictional account-security notice",
+    "subject": "Review the practice account notice",
+    "sender_display_name": "PhishShield Account Desk",
+    "sender_email": "account-review@example.com",
+    "reply_to": "helpdesk@example.net",
+    "email_body": "This classroom-only sample says that a fictional training account needs review today. It asks the reader to visit https://example.com/training/account-review. The address is nonfunctional for this exercise. Never enter real account details.",
+    "psychological_trigger": "Urgency and fear of account interruption",
+    "suspicious_indicators": [
+      "The reply-to domain differs from the sender domain.",
+      "The message applies time pressure to an unexpected account notice.",
+      "The destination is unrelated to any independently verified service."
+    ],
+    "expected_detection_reason": "Unexpected security action, mismatched reply-to address, and pressure to act are combined as heuristic warning signs.",
+    "recommended_user_action": "Do not follow the link or reply. Verify account notices by opening a known official app or contacting support through a previously verified channel."
+  },
+  {
+    "email_id": "PS-PH-002",
+    "email_type": "phishing",
+    "scenario": "Fictional HR policy notification",
+    "subject": "New staff policy acknowledgement",
+    "sender_display_name": "People Operations",
+    "sender_email": "policy-notice@example.com",
+    "reply_to": "policy-questions@example.org",
+    "email_body": "A fictional People Operations message announces a new practice policy and asks staff to confirm that they have read it at https://example.com/training/policy. No real policy or employee record is involved.",
+    "psychological_trigger": "Authority and fear of noncompliance",
+    "suspicious_indicators": [
+      "A policy action is requested from an unexpected sender.",
+      "The reply-to domain differs from the sender domain.",
+      "The link should be independently checked before use."
+    ],
+    "expected_detection_reason": "A purported HR authority combined with an unverified policy link and mismatched reply-to merits independent confirmation.",
+    "recommended_user_action": "Check the policy through the organization's known HR portal or contact HR using a directory entry, not details in the message."
+  },
+  {
+    "email_id": "PS-PH-003",
+    "email_type": "phishing",
+    "scenario": "Fictional delivery service notification",
+    "subject": "A sample parcel update is available",
+    "sender_display_name": "Campus Parcel Updates",
+    "sender_email": "parcel-update@example.org",
+    "reply_to": "parcel-update@example.org",
+    "email_body": "This educational message refers to a fictional parcel with no real tracking number. It says a delivery preference can be reviewed at https://example.com/training/parcel. No payment is requested or possible.",
+    "psychological_trigger": "Curiosity and familiarity with delivery notifications",
+    "suspicious_indicators": [
+      "The recipient may not be expecting a parcel.",
+      "The message provides no independently verifiable tracking reference.",
+      "The destination is not an independently confirmed delivery provider."
+    ],
+    "expected_detection_reason": "An unsolicited service update with no verifiable shipment context is suspicious even without urgency or a reply-to mismatch.",
+    "recommended_user_action": "If expecting a delivery, check the merchant or carrier using an address from a previous trusted receipt; otherwise report or delete the message."
+  },
+  {
+    "email_id": "PS-PH-004",
+    "email_type": "phishing",
+    "scenario": "Fictional student reward announcement",
+    "subject": "A classroom participation reward is waiting",
+    "sender_display_name": "Student Rewards Desk",
+    "sender_email": "rewards@example.com",
+    "reply_to": "claims@example.net",
+    "email_body": "A fictional notice says that a classroom participation certificate can be viewed at https://example.com/training/reward. It asks for no personal information and describes no real reward.",
+    "psychological_trigger": "Financial incentives and rewards",
+    "suspicious_indicators": [
+      "An unsolicited reward is offered without context.",
+      "The reply-to domain differs from the sender domain.",
+      "The reward destination is not verified by an official campus channel."
+    ],
+    "expected_detection_reason": "Unexpected reward framing plus a sender/reply-to mismatch creates a reason to verify independently.",
+    "recommended_user_action": "Do not provide information or pay a fee to claim an unexpected reward. Confirm through the institution's known announcements channel."
+  },
+  {
+    "email_id": "PS-PH-005",
+    "email_type": "phishing",
+    "scenario": "Fictional familiar club shared-material notice",
+    "subject": "Notes from our practice club session",
+    "sender_display_name": "Campus Coding Club",
+    "sender_email": "club-notes@example.net",
+    "reply_to": "club-notes@example.net",
+    "email_body": "A fictional message refers to a recent club session and suggests viewing its notes at https://example.com/training/club-notes. No file is attached and no real club or notes exist.",
+    "psychological_trigger": "Familiarity and trust",
+    "suspicious_indicators": [
+      "The familiar club context has not been independently confirmed.",
+      "The sender domain is not established as an official campus domain."
+    ],
+    "expected_detection_reason": "A familiar topic can be imitated; the sender and unexpected destination should be verified before use.",
+    "recommended_user_action": "Ask a club organizer through a previously known channel whether the message is genuine. Do not use the message link."
+  },
+  {
+    "email_id": "PS-LEG-001",
+    "email_type": "legitimate",
+    "scenario": "Routine campus library-hours announcement",
+    "subject": "Library hours for the coming week",
+    "sender_display_name": "Campus Library",
+    "sender_email": "library@example.com",
+    "reply_to": "library@example.com",
+    "email_body": "Hello students, the library will follow its regular weekday hours next week. The current schedule is posted on the campus notice board. No action is needed. Regards, Campus Library.",
+    "psychological_trigger": "None; routine informational message",
+    "suspicious_indicators": [],
+    "expected_detection_reason": "No notable warning signs are present in this fictional routine announcement; context and sender identity should still be assessed.",
+    "recommended_user_action": "Read as routine information. If the schedule affects your plans, confirm it through the usual campus notice board."
+  },
+  {
+    "email_id": "PS-LEG-002",
+    "email_type": "legitimate",
+    "scenario": "Academic meeting reminder",
+    "subject": "Reminder: project seminar on Thursday",
+    "sender_display_name": "MCA Course Office",
+    "sender_email": "course-office@example.com",
+    "reply_to": "course-office@example.com",
+    "email_body": "Hello students, the project seminar is scheduled for Thursday at 11:00 a.m. in the usual seminar room. Please bring your notes. This reminder does not request a login, payment, or reply. Regards, MCA Course Office.",
+    "psychological_trigger": "None; expected academic coordination",
+    "suspicious_indicators": [],
+    "expected_detection_reason": "The message is a routine reminder with consistent fictional sender and reply-to fields and no sensitive request.",
+    "recommended_user_action": "Add the seminar to your calendar. Verify room changes using the normal course announcements channel."
+  },
+  {
+    "email_id": "PS-LEG-003",
+    "email_type": "legitimate",
+    "scenario": "Routine departmental announcement",
+    "subject": "Department seminar registration is open",
+    "sender_display_name": "MCA Department Office",
+    "sender_email": "department@example.com",
+    "reply_to": "department@example.com",
+    "email_body": "Hello students, registration for the department's research seminar is open until next Wednesday. Details are available on the usual department notice board. Registration is optional and no password or payment is requested in this message. Regards, MCA Department Office.",
+    "psychological_trigger": "None; routine optional announcement",
+    "suspicious_indicators": [],
+    "expected_detection_reason": "A regular optional announcement with no unexpected sensitive request has no obvious phishing signal in the sample.",
+    "recommended_user_action": "If interested, consult the usual department notice board and follow its normal registration process."
+  },
+  {
+    "email_id": "PS-LEG-004",
+    "email_type": "legitimate",
+    "scenario": "Routine study-group meeting coordination",
+    "subject": "Study group meeting time",
+    "sender_display_name": "MCA Study Group",
+    "sender_email": "study-group@example.com",
+    "reply_to": "study-group@example.com",
+    "email_body": "Hi everyone, our study group will meet in the library discussion area on Tuesday at 3:00 p.m. Please reply only if you need to suggest a different time. There is no attachment or external link. Thanks, MCA Study Group.",
+    "psychological_trigger": "None; ordinary coordination between classmates",
+    "suspicious_indicators": [],
+    "expected_detection_reason": "The fictional message is an expected coordination note, does not request sensitive data, and contains no link or attachment.",
+    "recommended_user_action": "Respond normally if you are part of the group; verify any unexpected change through the group's established channel."
+  },
+  {
+    "email_id": "PS-LEG-005",
+    "email_type": "legitimate",
+    "scenario": "Library maintenance notice",
+    "subject": "Brief reading-room maintenance on Saturday",
+    "sender_display_name": "Campus Library",
+    "sender_email": "library@example.com",
+    "reply_to": "library@example.com",
+    "email_body": "Hello students, the east reading room will be closed for routine maintenance on Saturday morning. Other library areas will remain open. No response is required. Please check the usual campus notice board for any schedule updates. Regards, Campus Library.",
+    "psychological_trigger": "None; routine service information",
+    "suspicious_indicators": [],
+    "expected_detection_reason": "This is a low-pressure operational notice with no link, attachment, or request for information.",
+    "recommended_user_action": "Plan to use another library area during the maintenance window and check the usual notice board for updates."
+  }
+]

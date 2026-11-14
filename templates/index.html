@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}PhishShield | Security awareness{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-content">
+  <p class="eyebrow">SECURITY AWARENESS WORKSPACE</p>
+  <h1>Build safer habits<br><span>one decision at a time.</span></h1>
+  <p class="hero-copy">
+    PhishShield brings instructor-led campaign management, interactive email exercises, learning analytics
+    and explainable email risk assessment into one workspace.
+  </p>
+  <div class="hero-actions">
+    {% if instructor_authenticated %}
+      <a class="button button-primary" href="{{ url_for('dashboard') }}">Open dashboard</a>
+      <a class="button button-secondary" href="{{ url_for('manage_campaigns') }}">Manage campaigns</a>
+    {% else %}
+      <a class="button button-primary" href="{{ url_for('instructor_login') }}">Instructor login</a>
+      <a class="button button-secondary" href="{{ url_for('campaigns') }}">Browse exercises</a>
+    {% endif %}
+    <a class="button button-quiet" href="{{ url_for('detection_tool') }}">Analyze an email</a>
+  </div>
+  </div>
+  <aside class="hero-aside" aria-label="Workspace capabilities">
+    <p class="eyebrow">WORKSPACE</p>
+    <div><strong>01</strong><span>Design focused training campaigns</span></div>
+    <div><strong>02</strong><span>Practice with safe, fictional messages</span></div>
+    <div><strong>03</strong><span>Review real local activity and outcomes</span></div>
+    <p class="safety-note"><strong>Local and safe by design.</strong> No email delivery, external link visits or collection of credentials.</p>
+  </aside>
+</section>
+
+<section class="module-section">
+  <div class="section-heading">
+    <div><p class="eyebrow">PHISHSHIELD MODULES</p><h2>A connected learning workflow</h2></div>
+    <p>Explore a module or follow the instructor workflow from campaign setup through results.</p>
+  </div>
+  <div class="intro-grid" aria-label="Application modules">
+  {% if instructor_authenticated %}
+  <article class="info-card">
+    <span class="card-number">01 / LIBRARY</span>
+    <h2>Email library & research</h2>
+    <p>Search fictional teaching messages, review instructor indicators and read supporting project research.</p>
+    <a href="{{ url_for('research') }}">Open the library</a>
+  </article>
+  {% endif %}
+  <article class="info-card">
+    <span class="card-number">02 / CAMPAIGNS</span>
+    <h2>Campaign management</h2>
+    <p>Choose assigned messages, activate or pause an exercise and share a local invitation link.</p>
+    <a href="{{ url_for('manage_campaigns') if instructor_authenticated else url_for('instructor_login') }}">{{ "Manage campaigns" if instructor_authenticated else "Instructor login" }}</a>
+  </article>
+  <article class="info-card">
+    <span class="card-number">03 / PRACTICE</span>
+    <h2>Interactive simulation</h2>
+    <p>Make a decision about each message and receive immediate, private educational feedback.</p>
+    <a href="{{ url_for('campaigns') }}">Browse active exercises</a>
+  </article>
+  <article class="info-card">
+    <span class="card-number">04 / ANALYSIS</span>
+    <h2>Email risk assessment</h2>
+    <p>Run the local rule-based detector and inspect its signals, score contributions and limitations.</p>
+    <a href="{{ url_for('detection_tool') }}">Analyze an email</a>
+  </article>
+  </div>
+</section>
+{% endblock %}

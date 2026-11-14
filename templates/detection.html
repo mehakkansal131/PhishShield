@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Email risk assessment | PhishShield{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">PYTHON RULE-BASED ANALYSIS</p>
+  <h1>Email risk assessment</h1>
+  <p>Analyze a library message or enter message details. PhishShield reports heuristic signals, not a probability or a guarantee of safety.</p>
+</section>
+
+<section class="detection-panel">
+  <form method="post" action="{{ url_for('detection_tool') }}" class="detection-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <fieldset class="detection-library">
+      <legend>Analyze a library email <span class="muted">(optional)</span></legend>
+      <label for="email-id">Training email</label>
+      <select id="email-id" name="email_id" {% if not samples %}disabled{% endif %}>
+        <option value="">Enter message details below</option>
+        {% for sample in samples %}
+        <option value="{{ sample.email_id }}" {% if selected_email_id == sample.email_id %}selected{% endif %}>
+          {{ sample.scenario }} — {{ sample.subject }}
+        </option>
+        {% endfor %}
+      </select>
+    </fieldset>
+    <fieldset class="manual-email-fields">
+      <legend>Or enter an email to analyze</legend>
+      <div class="form-grid">
+        <div><label for="sender-name">Sender display name</label><input id="sender-name" name="sender_display_name" type="text" maxlength="150" value="{{ form_values.sender_display_name }}" autocomplete="off"></div>
+        <div><label for="sender-email">Sender address</label><input id="sender-email" name="sender_email" type="text" maxlength="320" value="{{ form_values.sender_email }}" autocomplete="off"></div>
+        <div><label for="reply-to">Reply-To address</label><input id="reply-to" name="reply_to" type="text" maxlength="320" value="{{ form_values.reply_to }}" autocomplete="off"></div>
+        <div><label for="subject">Subject</label><input id="subject" name="subject" type="text" maxlength="500" value="{{ form_values.subject }}" autocomplete="off"></div>
+      </div>
+      <label for="email-body">Message body</label>
+      <textarea id="email-body" name="email_body" rows="8" maxlength="20000">{{ form_values.email_body }}</textarea>
+      <label for="urls">URLs to inspect <span class="muted">(optional; one per line)</span></label>
+      <textarea id="urls" name="urls" rows="3" maxlength="4096">{{ form_values.urls }}</textarea>
+      <p class="muted">Inputs are processed locally. URL destinations are never contacted, and attachments are not opened.</p>
+    </fieldset>
+    <button class="button button-primary" type="submit">Analyze message</button>
+  </form>
+</section>
+
+{% if result %}
+<section class="detection-result" aria-live="polite">
+  <p class="eyebrow">ANALYSIS RESULT{% if selected_email_id %} · {{ selected_email_id }}{% endif %}</p>
+  <div class="risk-summary risk-{{ result.risk_level|lower }}">
+    <div><span>Heuristic risk score</span><strong>{{ result.risk_score }} / 100</strong></div>
+    <div><span>Risk level</span><strong>{{ result.risk_level }}</strong></div>
+    <div><span>Assessment</span><strong>{{ result.verdict }}</strong></div>
+  </div>
+  <p class="muted">This score is not a calibrated probability. A low score does not prove a message is safe.</p>
+
+  <div class="analysis-columns">
+    <section>
+      <h2>Detected indicators</h2>
+      {% if result.reasons %}
+      <ul class="indicator-list">
+        {% for reason in result.reasons %}
+        <li><strong>{{ reason.rule|replace('_', ' ')|title }}:</strong> {{ reason.explanation }}
+          {% if reason.details %}<ul>{% for detail in reason.details %}<li>{{ detail }}</li>{% endfor %}</ul>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No configured warning rules were triggered. This does not establish that the message is safe.</p>
+      {% endif %}
+    </section>
+    <section>
+      <h2>Rule-by-rule results</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Rule</th><th>Outcome</th><th>Score contribution</th><th>Explanation</th></tr></thead>
+          <tbody>
+          {% for rule in result.rule_results %}
+          <tr><td>{{ rule.name|replace('_', ' ')|title }}</td><td>{{ rule.outcome|replace('_', ' ')|title }}</td><td>{{ rule.score_contribution }}</td><td>{{ rule.explanation }}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+  {% if result.urls %}
+  <section class="summary-section">
+    <h2>URL text observed</h2>
+    <ul class="indicator-list">
+    {% for item in result.urls %}<li><span>{{ item.text }}</span>{% if item.url != item.text %} — <span>{{ item.url }}</span>{% endif %}</li>{% endfor %}
+    </ul>
+    <p class="muted">Text-only observations. PhishShield did not visit these destinations.</p>
+  </section>
+  {% endif %}
+  <section class="analytics-limits">
+    <h2>Limitations and unavailable evidence</h2>
+    <ul>{% for limitation in result.limitations %}<li>{{ limitation }}</li>{% endfor %}</ul>
+  </section>
+</section>
+{% endif %}
+{% endblock %}

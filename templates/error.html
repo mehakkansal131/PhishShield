@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Request not available | PhishShield{% endblock %}
+{% block content %}
+<section class="feedback-panel">
+  <p class="eyebrow">REQUEST NOT COMPLETED</p>
+  <h1>We could not complete that action</h1>
+  <p>{{ message }}</p>
+  <a class="button button-secondary" href="{{ url_for('index') }}">Return home</a>
+</section>
+{% endblock %}

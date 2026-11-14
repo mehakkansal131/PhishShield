@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Message preview | PhishShield{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading">
+  <p class="eyebrow">SIMULATED INBOX</p>
+  <h1>Review the message</h1>
+  <p>This is fictional training content. The message body is shown as plain text.</p>
+</section>
+
+<article class="email-panel">
+  <div class="email-topline">
+    <span class="email-icon" aria-hidden="true">✉</span>
+    <div><p class="email-label">Training message</p><p class="muted">Local simulation · no email was received</p></div>
+  </div>
+  <dl class="email-details">
+    <div><dt>From</dt><dd>{{ sample.sender_display_name }} &lt;{{ sample.sender_email }}&gt;</dd></div>
+    <div><dt>Reply-To</dt><dd>{{ sample.reply_to }}</dd></div>
+    <div><dt>Subject</dt><dd>{{ sample.subject }}</dd></div>
+    <div><dt>Received</dt><dd>Simulated classroom session</dd></div>
+  </dl>
+  <div class="email-body">{{ sample.email_body }}</div>
+  <p class="simulation-note">Any example.com address in this message is inert. The simulated action below stays inside PhishShield.</p>
+  <div class="email-actions">
+    <form method="post" action="{{ url_for('simulated_click', email_id=sample.email_id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="button button-primary" type="submit">Open simulated link</button>
+    </form>
+    <form method="post" action="{{ url_for('report_email', email_id=sample.email_id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="button button-report" type="submit">Report this message</button>
+    </form>
+  </div>
+</article>
+<p class="back-link"><a href="{{ url_for('campaigns') }}">← Back to scenarios</a></p>
+{% endblock %}

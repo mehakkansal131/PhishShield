@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Campaign management | PhishShield{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">INSTRUCTOR WORKSPACE</p>
+  <h1>Campaign management</h1>
+  <p>Assemble a focused exercise from the email library, choose whether to activate it now, then share its local invitation link.</p>
+</section>
+
+<section class="management-layout">
+  <div class="info-card campaign-create-panel">
+    <div class="panel-heading">
+      <div><p class="eyebrow">NEW CAMPAIGN</p><h2>Create a campaign</h2></div>
+    </div>
+    <form method="post" action="{{ url_for('manage_campaigns') }}" class="campaign-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="create">
+      <label for="campaign-name">Campaign name</label>
+      <input id="campaign-name" name="campaign_name" type="text" maxlength="100" required>
+      <label for="campaign-description">Description <span class="muted">(optional)</span></label>
+      <textarea id="campaign-description" name="description" rows="3" maxlength="500"></textarea>
+      <label for="campaign-status">Initial status</label>
+      <select id="campaign-status" name="status">
+        <option value="draft" selected>Draft — configure before sharing</option>
+        <option value="active">Active — accept participants now</option>
+      </select>
+      <fieldset class="email-selection">
+        <legend>Assign training emails <span class="muted">(select at least one)</span></legend>
+        {% for sample in samples %}
+        <label class="selection-option">
+          <input type="checkbox" name="email_ids" value="{{ sample.email_id }}">
+          <span><strong>{{ sample.subject }}</strong><small>{{ sample.scenario }} · {{ sample.email_id }}</small></span>
+        </label>
+        {% else %}
+        <p class="empty-state">No valid emails are available. Review the dataset status before creating a campaign.</p>
+        {% endfor %}
+      </fieldset>
+      <button class="button button-primary" type="submit">Create campaign</button>
+    </form>
+  </div>
+
+  <section class="campaign-list">
+    <div class="section-heading">
+      <div><p class="eyebrow">CAMPAIGNS</p><h2>Manage existing campaigns</h2></div>
+      <span class="muted">{{ campaigns|length }} total</span>
+    </div>
+    {% for campaign in campaigns %}
+    <article class="campaign-card">
+      <div class="campaign-card-heading">
+        <div><h3>{{ campaign.campaign_name }}</h3><span class="status-chip status-{{ campaign.status }}">{{ campaign.status }}</span></div>
+        <div class="campaign-card-links">
+          <a href="{{ url_for('campaign_dashboard', campaign_id=campaign.campaign_id) }}">Analytics</a>
+          {% if campaign.status == "active" %}
+          <a href="{{ url_for('join_campaign', campaign_id=campaign.campaign_id) }}">Invitation</a>
+          {% endif %}
+        </div>
+      </div>
+      <p>{{ campaign.description or "No description provided." }}</p>
+      <p class="campaign-meta">{{ campaign.email_ids|length }} assigned emails · {{ campaign.created_at[:10] if campaign.created_at else "Local test campaign" }}</p>
+      {% if campaign.status == "active" %}
+      <div class="invitation-link">
+        <span>Participant link</span>
+        <code>{{ url_for('join_campaign', campaign_id=campaign.campaign_id) }}</code>
+      </div>
+      {% endif %}
+
+      {% if campaign.status != "completed" %}
+      <details class="campaign-edit">
+        <summary>Edit campaign</summary>
+        <form method="post" action="{{ url_for('manage_campaigns') }}" class="campaign-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="action" value="update">
+          <input type="hidden" name="campaign_id" value="{{ campaign.campaign_id }}">
+          <label for="name-{{ campaign.campaign_id }}">Campaign name</label>
+          <input id="name-{{ campaign.campaign_id }}" name="campaign_name" type="text" maxlength="100" value="{{ campaign.campaign_name }}" required>
+          <label for="description-{{ campaign.campaign_id }}">Description</label>
+          <textarea id="description-{{ campaign.campaign_id }}" name="description" rows="2" maxlength="500">{{ campaign.description }}</textarea>
+          {% if campaign.status == "draft" %}
+          <input type="hidden" name="update_emails" value="yes">
+          <fieldset class="email-selection">
+            <legend>Assigned emails</legend>
+            {% for sample in samples %}
+            <label class="selection-option">
+              <input type="checkbox" name="email_ids" value="{{ sample.email_id }}" {% if sample.email_id in campaign.email_ids %}checked{% endif %}>
+              <span><strong>{{ sample.subject }}</strong><small>{{ sample.scenario }}</small></span>
+            </label>
+            {% endfor %}
+          </fieldset>
+          {% endif %}
+          <button class="button button-secondary" type="submit">Save changes</button>
+        </form>
+      </details>
+      <div class="campaign-controls">
+        <form method="post" action="{{ url_for('manage_campaigns') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="action" value="status">
+          <input type="hidden" name="campaign_id" value="{{ campaign.campaign_id }}">
+          {% if campaign.status == "draft" %}
+            <input type="hidden" name="status" value="active">
+            <button class="button button-primary" type="submit">Activate</button>
+          {% elif campaign.status == "paused" %}
+            <input type="hidden" name="status" value="active">
+            <button class="button button-primary" type="submit">Resume</button>
+          {% else %}
+            <input type="hidden" name="status" value="paused">
+            <button class="button button-secondary" type="submit">Pause</button>
+          {% endif %}
+        </form>
+        <form method="post" action="{{ url_for('manage_campaigns') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="action" value="status">
+          <input type="hidden" name="campaign_id" value="{{ campaign.campaign_id }}">
+          <input type="hidden" name="status" value="completed">
+          <button class="button button-quiet" type="submit">Close campaign</button>
+        </form>
+      </div>
+      {% endif %}
+    </article>
+    {% else %}
+    <p class="empty-state">No campaigns have been created yet.</p>
+    {% endfor %}
+  </section>
+</section>
+{% endblock %}

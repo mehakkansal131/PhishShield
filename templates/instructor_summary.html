@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Instructor summary | PhishShield{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <p class="eyebrow">DEVELOPMENT SUMMARY</p>
+  <h1>Instructor activity summary</h1>
+  <p>This is an unauthenticated local demonstration page, not secure access control. Activity is stored in the local SQLite database and persists after the server stops.</p>
+</section>
+<p class="back-link"><a href="{{ url_for('dashboard') }}">Open campaign analytics dashboard →</a></p>
+<p class="back-link"><a href="{{ url_for('manage_campaigns') }}">Manage or create campaigns →</a></p>
+
+<section class="metrics-grid" aria-label="Activity totals">
+  <article class="metric-card"><span>Messages opened</span><strong>{{ summary.opened }}</strong></article>
+  <article class="metric-card"><span>Simulated clicks</span><strong>{{ summary.clicks }}</strong></article>
+  <article class="metric-card"><span>Reports</span><strong>{{ summary.reports }}</strong></article>
+  <article class="metric-card"><span>Anonymous participants</span><strong>{{ summary.unique_participants }}</strong></article>
+</section>
+
+<section class="summary-section">
+  <h2>Campaign records</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Campaign</th><th>Status</th><th>Created</th><th>Campaign ID</th></tr></thead>
+      <tbody>
+      {% for campaign in campaign_records %}
+        <tr><td>{{ campaign.campaign_name }}</td><td>{{ campaign.status }}</td><td>{{ campaign.created_at or "Test store" }}</td><td>{{ campaign.campaign_id }}</td></tr>
+      {% else %}
+        <tr><td colspan="4">No campaign records are available.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="summary-section">
+  <h2>Available scenarios</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Scenario</th><th>Subject</th><th>Instructor label</th></tr></thead>
+      <tbody>
+      {% for sample in campaigns %}
+        <tr><td>{{ sample.scenario }}</td><td>{{ sample.subject }}</td><td><span class="label-chip label-{{ sample.email_type }}">{{ sample.email_type }}</span></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="summary-section">
+  <h2>Recorded activity</h2>
+  <p class="muted">Counts represent accepted unique actions per anonymous browser session and sample. Repeating an action or refreshing does not add another event.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Time (UTC)</th><th>Action</th><th>Scenario ID</th><th>Anonymous participant</th></tr></thead>
+      <tbody>
+      {% for event in events %}
+        <tr><td>{{ event.timestamp }}</td><td>{{ event.event_type }}</td><td>{{ event.email_id }}</td><td>{{ event.participant_id }}</td></tr>
+      {% else %}
+        <tr><td colspan="4">No activity recorded yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
